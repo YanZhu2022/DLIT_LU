@@ -86,7 +86,10 @@ class SummaryInputs:
 
     summary_zone_name: str
     normits_to_lad_file: pydantic.FilePath
-    # lsoa_to_lad_file: pydantic.FilePath
+    lsoa_to_lad_file: pydantic.FilePath
+    msoa_to_lad_file: pydantic.FilePath
+    norms_to_lad_file: pydantic.FilePath
+    noham_to_lad_file: pydantic.FilePath
     shapefile: pydantic.FilePath
     shapefile_id_column: str
     geometry_simplify_tolerance: int | None = None

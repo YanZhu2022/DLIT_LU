@@ -38,6 +38,9 @@ class BaseZoneHandler:
                     "emp": config.dev_pattern.lsoa_emp_centroids,
                     "pop": config.dev_pattern.lsoa_pop_centroids,
                 },
+                "zone_to_lad_path": config.dev_pattern.summary_data.lsoa_to_lad_file,
+                "lad_id_col": "lad2013_id",
+                "zone_to_lad_prop": "lsoa2021_to_lad2013",
             },
             "normits": {
                 "shapefile_path": config.dev_pattern.normits_shapefile_path,
@@ -51,8 +54,8 @@ class BaseZoneHandler:
                     "pop": config.dev_pattern.normits_pop_centroids,
                 },
                 "zone_to_lad_path": config.dev_pattern.summary_data.normits_to_lad_file,
-                "lad_id_col": "lad2011_id",
-                "zone_to_lad_prop": "normits_v3.3_to_lad2011",
+                "lad_id_col": "lad2013_id",
+                "zone_to_lad_prop": "normits_v3.3_to_lad2013",
             },
             "noham": {
                 "shapefile_path": config.dev_pattern.noham_shapefile_path,
@@ -65,6 +68,9 @@ class BaseZoneHandler:
                     "emp": config.dev_pattern.noham_emp_centroids,
                     "pop": config.dev_pattern.noham_pop_centroids,
                 },
+                "zone_to_lad_path": config.dev_pattern.summary_data.noham_to_lad_file,
+                "lad_id_col": "lad2013_id",
+                "zone_to_lad_prop": "noham_v3.7_to_lad2013",
             },
             "norms": {
                 "shapefile_path": config.dev_pattern.norms_shapefile_path,
@@ -77,6 +83,9 @@ class BaseZoneHandler:
                     "emp": config.dev_pattern.norms_emp_centroids,
                     "pop": config.dev_pattern.norms_pop_centroids,
                 },
+                "zone_to_lad_path": config.dev_pattern.summary_data.norms_to_lad_file,
+                "lad_id_col": "lad2013_id",
+                "zone_to_lad_prop": "norms_v3.3_to_lad2013",
             },
             "msoa": {
                 "shapefile_path": config.dev_pattern.msoa_shapefile_path,
@@ -89,6 +98,9 @@ class BaseZoneHandler:
                     "emp": config.dev_pattern.msoa_emp_centroids,
                     "pop": config.dev_pattern.msoa_pop_centroids,
                 },
+                "zone_to_lad_path": config.dev_pattern.summary_data.msoa_to_lad_file,
+                "lad_id_col": "lad2013_id",
+                "zone_to_lad_prop": "msoa2021_to_lad2013",
             },
         }
 
