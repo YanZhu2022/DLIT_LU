@@ -1185,8 +1185,8 @@ def run(input_data: global_classes.AssessData, config: inputs.DLitConfig):
     emp_stats, emp_z_scores = process_stats(
         emp_zone_sites, "Employment", columns_to_explore
     )
-    res_stats_file = "residential_sites_stats_{geo_boundary}.csv"
-    emp_stats_file = "employment_sites_stats_{geo_boundary}.csv"
+    res_stats_file = f"residential_sites_stats_{geo_boundary}.csv"
+    emp_stats_file = f"employment_sites_stats_{geo_boundary}.csv"
 
     utilities.write_to_csv(key_output_path / res_stats_file, res_stats)
     utilities.write_to_csv(key_output_path / emp_stats_file, emp_stats)
