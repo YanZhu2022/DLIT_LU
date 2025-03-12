@@ -108,9 +108,12 @@ constraint:
   ddg_pop: I:\NorMITs Demand\import\edge_replicant\edge_inputs\Drivers\Jan 24 central DDG drivers\DD_Jan24_Central_Pop_LA.csv
   ddg_emp: I:\NorMITs Demand\import\edge_replicant\edge_inputs\Drivers\Jan 24 central DDG drivers\DD_Jan24_Central_Emp_LA.csv
   # Inputs from previous module dev_pattern
-  dlog_household: I:\Data\D-Log\DLIT\Outputs\test12\05_aggregation\lad_household.csv
+  dlog_hh: I:\Data\D-Log\DLIT\Outputs\test12\05_aggregation\lad_household.csv
   dlog_employment: I:\Data\D-Log\DLIT\Outputs\test12\05_aggregation\lad_job.csv
   dlog_population: I:\Data\D-Log\DLIT\Outputs\test12\05_aggregation\lad_population.csv
+  ntem_hh: I:\Data\D-Log\DLIT\Outputs\planning_data_out\translated\LAD13_Households.csv
+  ntem_pop: I:\Data\D-Log\DLIT\Outputs\planning_data_out\translated\LAD13_Jobs.csv
+  ntem_employment: I:\Data\D-Log\DLIT\Outputs\planning_data_out\translated\LAD13_Population.csv
   sector: region #region, combined_lad 
   base_year: 2023
   lad_to_region_file: I:\Data\D-Log\DLIT\Inputs\lad2013_region\lad13_ntem_region_spatial.csv

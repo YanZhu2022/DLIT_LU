@@ -121,7 +121,7 @@ class ConstraintProcessor():
         totals_after = {col: region_agg[col].sum() for col in val_cols}
 
         for col in val_cols:
-            if not np.all(pd.np.isclose(totals_before[col], totals_after[col])):
+            if not np.all(np.isclose(totals_before[col], totals_after[col])):
                 raise ValueError(f"Total of '{col}' changed after aggregation: before={totals_before[col]}, after={totals_after[col]}")
 
         return region_agg
@@ -193,8 +193,8 @@ class ConstraintProcessor():
             Dictionary containing datasets split into DDG and DLOG.
         """
         # Define the source names based on the order of datasets
-        source_names = ['DDG', 'DDG', 'DLOG', 'DLOG', 'DDG', 'DDG', 'DLOG', 'DLOG']
-    
+        source_names = ['DDG', 'DDG', 'DLOG', 'DLOG', 'NTEM', 'NTEM' , 'DDG', 'DDG', 'DLOG', 'DLOG', 'NTEM', 'NTEM']
+
         # Add Source column to each dataset and reorder columns
         for i, data in enumerate(growth_rate_results):
             data['Source'] = source_names[i]
@@ -212,18 +212,24 @@ class ConstraintProcessor():
         # Split datasets into DDG and DLOG
         ddg_pop = growth_rate_results[0]
         dlog_pop = growth_rate_results[2]
+        ntem_pop = growth_rate_results[4]
         ddg_emp = growth_rate_results[1]
         dlog_emp = growth_rate_results[3]
-        region_ddg_pop = growth_rate_results[4]
-        region_dlog_pop = growth_rate_results[6]
-        region_ddg_emp = growth_rate_results[5]
-        region_dlog_emp = growth_rate_results[7]
+        ntem_emp = growth_rate_results[5]
+        region_ddg_pop = growth_rate_results[6]
+        region_dlog_pop = growth_rate_results[8]
+        region_ntem_pop = growth_rate_results[10]
+        region_ddg_emp = growth_rate_results[7]
+        region_dlog_emp = growth_rate_results[9]
+        region_ntem_emp = growth_rate_results[11]
+
+
 
         return {
-            'LAD_Population': {'DDG': ddg_pop, 'DLOG': dlog_pop},
-            'LAD_Employment': {'DDG': ddg_emp, 'DLOG': dlog_emp},
-            'Region_Population': {'DDG': region_ddg_pop, 'DLOG': region_dlog_pop},
-            'Region_Employment': {'DDG': region_ddg_emp, 'DLOG': region_dlog_emp}
+            'LAD_Population': {'DDG': ddg_pop, 'DLOG': dlog_pop, 'NTEM':ntem_pop},
+            'LAD_Employment': {'DDG': ddg_emp, 'DLOG': dlog_emp, 'NTEM':ntem_emp},
+            'Region_Population': {'DDG': region_ddg_pop, 'DLOG': region_dlog_pop, 'NTEM':region_ntem_pop},
+            'Region_Employment': {'DDG': region_ddg_emp, 'DLOG': region_dlog_emp, 'NTEM':region_ntem_emp}
         }
     
 class GrowthCalculator:
@@ -239,8 +245,10 @@ class GrowthCalculator:
         ----------
         data : pd.DataFrame
             DataFrame containing year columns.
-        year_columns : list
-            List of year columns to calculate absolute growth.
+        base_year_int : int
+            The base year for calculations.
+        build_out_columns : list
+            List of future year columns to calculate absolute growth.
 
         Returns
         -------
@@ -251,9 +259,9 @@ class GrowthCalculator:
         base_year = str(base_year_int)
         
         for future_year in build_out_columns:
-            abs_growth[f'AbsGrowth_{future_year}'] = data[future_year] - data[base_year]
+            abs_growth[future_year] = data[future_year] - data[base_year]
         
-        result_columns = list(data.columns[:3]) + [f'AbsGrowth_{year}' for year in build_out_columns]
+        result_columns = list(data.columns[:3]) + [year for year in build_out_columns]
         
         return abs_growth[result_columns]
         
@@ -279,9 +287,9 @@ class GrowthCalculator:
         base_year = str(base_year_int)
         
         for future_year in build_out_columns:
-            growth_ratio[f'GrowthRatio_{future_year}'] = data[future_year] / data[base_year]
+            growth_ratio[future_year] = data[future_year] / data[base_year]
         
-        result_columns = list(data.columns[:3]) + [f'GrowthRatio_{year}' for year in build_out_columns]
+        result_columns = list(data.columns[:3]) + [year for year in build_out_columns]
         
         return growth_ratio[result_columns]
     
@@ -307,13 +315,13 @@ class GrowthCalculator:
         base_year = str(base_year_int)
         
         for future_year in build_out_columns:
-            target_growth[f'TargetGrowth_{future_year}'] = (original_data[future_year] / original_data[base_year] - 1) * original_data[base_year]
+            target_growth[future_year] = (original_data[future_year] / original_data[base_year] - 1) * original_data[base_year]
         
-        result_columns = list(original_data.columns[:3]) + [f'TargetGrowth_{year}' for year in build_out_columns]
+        result_columns = list(original_data.columns[:3]) + [year for year in build_out_columns]
         
         return target_growth[result_columns]
 
-    def calculate_annual_growth_rate(self, data, year_columns):
+    def calculate_annual_growth_rate(self, data, build_out_columns):
         """
         Calculate the Compound Annual Growth Rate (CAGR) for each period between consecutive years.
 
@@ -342,7 +350,7 @@ class GrowthCalculator:
         """
 
         growth_rate = data.copy()
-        year_columns = sorted([int(year) for year in year_columns])
+        year_columns = sorted([int(year) for year in build_out_columns])
 
         cagr_columns = []
 
@@ -358,7 +366,7 @@ class GrowthCalculator:
                     return None  
                 return ((end_value / start_value) ** (1 / years) - 1) * 100
 
-            cagr_column_name = f'CAGR_{end_year}'
+            cagr_column_name = str(end_year)
             growth_rate[cagr_column_name] = data.apply(calculate_row_growth, axis=1)
             cagr_columns.append(cagr_column_name)
 
@@ -390,9 +398,9 @@ class GrowthCalculator:
         base_year = str(base_year_int)
         
         for future_year in build_out_columns:
-            target_with_base[f'TargetWithBase_{future_year}'] = target_data[f'TargetGrowth_{future_year}'] + original_data[base_year]
+            target_with_base[future_year] = target_data[future_year] + original_data[base_year]
         
-        result_columns = list(original_data.columns[:3]) + [f'TargetWithBase_{year}' for year in build_out_columns]
+        result_columns = list(original_data.columns[:3]) + [year for year in build_out_columns]
         
         return target_with_base[result_columns]
 
@@ -425,7 +433,6 @@ class GrowthCalculator:
     
         
 def run(config: inputs.DLitConfig):
-
     if config.dev_pattern is None:
         raise ValueError("Cannot run development pattern without any dev_pattern parameters")
 
@@ -438,26 +445,40 @@ def run(config: inputs.DLitConfig):
     ddg_emp = pd.read_csv(config.constraint.ddg_emp)
     dlog_population = pd.read_csv(config.constraint.dlog_population)
     dlog_employment = pd.read_csv(config.constraint.dlog_employment)
+    ntem_household = pd.read_csv(config.constraint.ntem_hh)
+    ntem_pop = pd.read_csv(config.constraint.ntem_pop)
+    ntem_emp = pd.read_csv(config.constraint.ntem_employment)
 
-    key_constraint_path = config.output_folder / f"06_constraint"
+    key_constraint_path = config.output_folder / f"07_constraint_test"
     key_constraint_path.mkdir(exist_ok=True)
 
     # Process data
-    year_columns = [col for col in dlog_population.columns if col.isdigit()]
+    year_columns = [col for col in ntem_pop.columns if col.isdigit()]
     base_year_column = config.constraint.base_year
     base_year_int = int(base_year_column)
-    build_out_columns = np.arange(base_year_int + 1, 2067, 1).tolist()
+    build_out_columns = np.arange(base_year_int + 1, 2062, 1).tolist()
     build_out_columns = [str(year) for year in build_out_columns]
 
     ddg_col = 'LAD13CD'
     ddg_pop = ddg_pop[[ddg_col] + year_columns]
     ddg_emp = ddg_emp[[ddg_col] + year_columns]
+    dlog_population = dlog_population[['lad2013_id'] + year_columns]
+    dlog_employment = dlog_employment[['lad2013_id'] + year_columns]
 
     ddg_pop = ddg_pop[~ddg_pop[ddg_col].str.startswith('LON')]
     ddg_emp = ddg_emp[~ddg_emp[ddg_col].str.startswith('LON')]
 
     ddg_pop = ddg_pop.rename(columns={'LAD13CD': 'lad2013_id'})
     ddg_emp = ddg_emp.rename(columns={'LAD13CD': 'lad2013_id'})
+
+    # Add Source column
+    ddg_pop['Source'] = 'DDG'
+    ddg_emp['Source'] = 'DDG'
+    dlog_population['Source'] = 'DLOG'
+    dlog_employment['Source'] = 'DLOG'
+    ntem_pop['Source'] = 'NTEM'
+    ntem_emp['Source'] = 'NTEM'
+    ntem_household['Source'] = 'NTEM'
 
     lad_id = "lad2013_id"
     name_column = "descriptions"
@@ -487,6 +508,24 @@ def run(config: inputs.DLitConfig):
         dlog_employment,
         base_year_column, 
         build_out_columns)
+    
+    region_ntem_emp = processor.region(
+        ntem_emp,
+        base_year_column, 
+        build_out_columns)
+    
+    region_ntem_pop = processor.region(
+        ntem_pop,
+        base_year_column, 
+        build_out_columns)
+
+    # Add Source column to aggregated data
+    region_ddg_pop['Source'] = 'DDG'
+    region_ddg_emp['Source'] = 'DDG'
+    region_dlog_pop['Source'] = 'DLOG'
+    region_dlog_emp['Source'] = 'DLOG'
+    region_ntem_pop['Source'] = 'NTEM'
+    region_ntem_emp['Source'] = 'NTEM'
 
     # Add names
     datasets = [
@@ -494,10 +533,14 @@ def run(config: inputs.DLitConfig):
         (ddg_emp, lad_id, name_column, False, False),
         (dlog_population, lad_id, name_column, False, False),
         (dlog_employment, lad_id, name_column, False, False),
+        (ntem_pop, lad_id, name_column, False, False),
+        (ntem_emp, lad_id, name_column, False, False),
         (region_ddg_pop, region_id, name_column_region, True, True),
         (region_ddg_emp, region_id, name_column_region, True, True),
         (region_dlog_pop, region_id, name_column_region, True, True),
-        (region_dlog_emp, region_id, name_column_region, True, True)
+        (region_dlog_emp, region_id, name_column_region, True, True),
+        (region_ntem_pop, region_id, name_column_region, True, True),
+        (region_ntem_emp, region_id, name_column_region, True, True),
     ]
     
     processed_datasets = []
@@ -507,6 +550,19 @@ def run(config: inputs.DLitConfig):
             data, id_col, name_col, use_region_name=use_region_name, use_region_cols=use_region_cols
         )
         processed_datasets.append(processed_data)
+
+    # Combine raw datasets into a dictionary
+    raw_datasets = {
+        'LAD_Population_Raw': {'DDG': processed_datasets[0], 'DLOG': processed_datasets[2], 'NTEM': processed_datasets[5]},
+        'LAD_Employment_Raw': {'DDG': processed_datasets[1], 'DLOG': processed_datasets[3], 'NTEM': processed_datasets[4]},
+        'Region_Population_Raw': {'DDG': processed_datasets[6], 'DLOG': processed_datasets[8], 'NTEM': processed_datasets[11]},
+        'Region_Employment_Raw': {'DDG': processed_datasets[7], 'DLOG': processed_datasets[9], 'NTEM': processed_datasets[10]},
+    }
+
+    # Save raw datasets to Excel
+    for category, datasets in raw_datasets.items():
+        excel_output_path = key_constraint_path / f'{category}.xlsx'
+        utilities.write_to_excel(excel_output_path, datasets)
 
     # Calculate growth metrics
     abs_growth_results = []
@@ -543,7 +599,6 @@ def run(config: inputs.DLitConfig):
     prepared_datasets_gra = processor.combine_datasets(growth_ratio_results)
     prepared_datasets_t = processor.combine_datasets(target)
 
-
     for category, datasets in prepared_datasets_gr.items():
         excel_output_path = key_constraint_path / f'{category}_GrowthRate.xlsx'
         utilities.write_to_excel(excel_output_path, datasets)
@@ -564,9 +619,9 @@ def run(config: inputs.DLitConfig):
         excel_output_path = key_constraint_path / f'{category}_Target.xlsx'
         utilities.write_to_excel(excel_output_path, datasets)
 
-
     # Visualize the data
     visualizer = GrowthRateVisualizer(output_dir=key_constraint_path / 'visualizations')
-    visualizer.generate_visualizations(prepared_datasets_gr)
+    # visualizer.generate_visualizations(prepared_datasets_gr)
+    visualizer.generate_visualizations(raw_datasets)  
 
     LOG.info("Data processing, aggregation, and visualization completed")

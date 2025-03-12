@@ -258,7 +258,10 @@ class ConstraintConfig:
     region_name: pydantic.FilePath
     ddg_pop: pydantic.FilePath
     ddg_emp: pydantic.FilePath
-    dlog_household: Optional[pathlib.Path] = None
+    ntem_hh: pydantic.FilePath
+    ntem_pop: pydantic.FilePath
+    ntem_employment: pydantic.FilePath
+    dlog_hh: Optional[pathlib.Path] = None
     dlog_employment: Optional[pathlib.Path] = None
     dlog_population: Optional[pathlib.Path] = None
 
