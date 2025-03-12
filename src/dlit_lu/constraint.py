@@ -448,8 +448,10 @@ def run(config: inputs.DLitConfig):
     ntem_household = pd.read_csv(config.constraint.ntem_hh)
     ntem_pop = pd.read_csv(config.constraint.ntem_pop)
     ntem_emp = pd.read_csv(config.constraint.ntem_employment)
+    # dlog_hh = pd.read_csv(config.constraint.dlog_hh)
+    # ntem_hh = pd.read_csv(config.constraint.ntem_hh)
 
-    key_constraint_path = config.output_folder / f"07_constraint_test"
+    key_constraint_path = config.output_folder / f"06_constraint"
     key_constraint_path.mkdir(exist_ok=True)
 
     # Process data
@@ -464,6 +466,7 @@ def run(config: inputs.DLitConfig):
     ddg_emp = ddg_emp[[ddg_col] + year_columns]
     dlog_population = dlog_population[['lad2013_id'] + year_columns]
     dlog_employment = dlog_employment[['lad2013_id'] + year_columns]
+    # dlog_hh = dlog_hh[['lad2013_id'] + year_columns]
 
     ddg_pop = ddg_pop[~ddg_pop[ddg_col].str.startswith('LON')]
     ddg_emp = ddg_emp[~ddg_emp[ddg_col].str.startswith('LON')]

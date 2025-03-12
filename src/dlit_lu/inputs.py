@@ -376,7 +376,7 @@ class DLitConfig(caf.toolkit.BaseConfig):
             raise ValueError("constraint is required if run_constraint is true")
 
         if not values.get("run_dev_pattern") and not all(
-            [value.dlog_household, value.dlog_employment, value.dlog_population]
+            [value.dlog_hh, value.dlog_employment, value.dlog_population]
         ):
             raise ValueError(
                 "dlog_household, dlog_employment, and dlog_population at LAD level are required if not running dev_pattern module"
